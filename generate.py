@@ -1,19 +1,12 @@
-import sys
 import time
 import wave
 
 import librosa
 import librosa.display
-import matplotlib.pyplot as plt
 import numpy as np
 import scipy.io.wavfile
-import soundfile as sf
-from playsound import playsound
 from pydub import AudioSegment
 
-# for i in range(10):
-#     print(str(i)+"\n"+str(i)+"\n"+str(i)+"\n"+"\033[3A",end="")
-#     time.sleep(1)
 
 def wav_read(path):
     rate,data = scipy.io.wavfile.read(path)
@@ -28,7 +21,7 @@ def stereo2monoral(path:str):
     sound.export("./formated.wav", format="wav")
 def sound2text(sound_list:list):
     text = []
-    for index,sound_elements in enumerate(sound_list):
+    for sound_elements in sound_list:
         element_text = ""
         for hz in range(0,10):
             if hz>8:
@@ -46,7 +39,6 @@ def sound2text(sound_list:list):
                     element_text+= " "
             element_text+="\n"
         text.append(element_text)
-    # print(text)
     return text
 def print_text(output_texts):
     for i in range(len(output_texts)):
@@ -61,7 +53,6 @@ if __name__ == "__main__":
 
     rate,data = wav_read(path)
     data =data/32768
-    # time_ =np.arange(0,data.shape[0]/rate,1/rate)
     fft_size = 1024
     hop_length = int(fft_size *2)
     amplitude = np.abs(librosa.core.stft(data,n_fft=fft_size,hop_length=hop_length))
