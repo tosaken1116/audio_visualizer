@@ -3,8 +3,6 @@ import wave
 
 import librosa
 import librosa.display
-import numpy as np
-import scipy.io.wavfile
 from pydub import AudioSegment
 
 
