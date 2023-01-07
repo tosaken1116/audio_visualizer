@@ -9,8 +9,8 @@ from pydub import AudioSegment
 
 
 def wav_read(path):
-    rate,data = scipy.io.wavfile.read(path)
-    return rate,data
+    y,sr = librosa.load(path)
+    return y,sr
 def is_channel_single(path:str):
     wf = wave.open(path, "r")
     return wf.getnchannels() ==1
@@ -23,17 +23,17 @@ def sound2text(sound_list:list):
     text = []
     for sound_elements in sound_list:
         element_text = ""
-        for hz in range(0,10):
-            if hz>8:
+        for hz in range(0,20):
+            if hz>16:
                 element_text +="\033[31m"
-            elif hz>4:
+            elif hz>8:
                 element_text +='\033[33m'
             elif hz>0:
                 element_text +='\033[32m'
             else:
                 element_text +="\033[0m"
             for sound_element in sound_elements:
-                if sound_element+30>5*hz:
+                if sound_element+30>3*hz:
                     element_text+="*"
                 else:
                     element_text+= " "
@@ -42,20 +42,18 @@ def sound2text(sound_list:list):
     return text
 def print_text(output_texts):
     for i in range(len(output_texts)):
-        print(f"{output_texts[i]}\033[10A",end="")
+        print(f"{output_texts[i]}\033[20A",end="")
         time.sleep(0.01)
-    print('\n')
+    print('\n\n\n\n\n')
 if __name__ == "__main__":
-    path ="./free.wav"
+    path ="./loop_free.wav"
     if not is_channel_single(path):
         stereo2monoral(path)
         path="./formated.wav"
 
-    rate,data = wav_read(path)
-    data =data/32768
-    fft_size = 1024
-    hop_length = int(fft_size *2)
-    amplitude = np.abs(librosa.core.stft(data,n_fft=fft_size,hop_length=hop_length))
-    log_power = librosa.core.amplitude_to_db(amplitude)
-    texts = sound2text(log_power)
+    y,sr = wav_read(path)
+    stft_data = librosa.stft(y)
+    magphase_data, phase = librosa.magphase(stft_data)
+    db = librosa.amplitude_to_db(magphase_data)
+    texts = sound2text(db.T)
     print_text(texts)
